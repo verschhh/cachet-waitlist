@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/pg": "^8.15.6",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "next": "16.0.4",
