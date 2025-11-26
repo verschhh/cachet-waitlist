@@ -1,0 +1,153 @@
+"use client";
+
+import React, { useState } from "react";
+
+const API_URL = "/api/waitlist";
+
+type Status = "idle" | "loading" | "success" | "error";
+
+export default function HomePage() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    try {
+      setStatus("loading");
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) throw new Error("Request failed");
+
+      setStatus("success");
+      setEmail("");
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className="page">
+      <div className="card">
+        <h1 className="title">Cachet Waitlist</h1>
+        <p className="subtitle">
+          Join the waitlist to be the first to access Cachet.
+        </p>
+
+        <form onSubmit={handleSubmit} className="form">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input"
+          />
+          <button
+            type="submit"
+            className="button"
+            disabled={status === "loading"}
+          >
+            {status === "loading" ? "Submitting…" : "Join the waitlist"}
+          </button>
+        </form>
+
+        {status === "success" && (
+          <p className="msg success">You&apos;re on the list 🎉</p>
+        )}
+        {status === "error" && (
+          <p className="msg error">Something went wrong. Please try again.</p>
+        )}
+      </div>
+
+      <style jsx>{`
+        :global(body) {
+          margin: 0;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            sans-serif;
+          background-color: #f7f7f7;
+        }
+        .page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+        }
+        .card {
+          max-width: 420px;
+          width: 100%;
+          background: #ffffff;
+          border-radius: 16px;
+          padding: 32px 28px;
+          text-align: center;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        }
+        .title {
+          font-size: 28px;
+          font-weight: 800;
+          color: #0c0c4f; /* close to your logo color */
+          margin-bottom: 8px;
+        }
+        .subtitle {
+          font-size: 15px;
+          color: #555;
+          margin-bottom: 24px;
+        }
+        .form {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .input {
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px solid #ddd;
+          font-size: 14px;
+          outline: none;
+        }
+        .input:focus {
+          border-color: #0c0c4f;
+          box-shadow: 0 0 0 2px rgba(12, 12, 79, 0.09);
+        }
+        .button {
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: none;
+          background-color: #0c0c4f;
+          color: #ffffff;
+          font-weight: 600;
+          font-size: 15px;
+          cursor: pointer;
+          transition: transform 0.05s ease, box-shadow 0.1s ease,
+            opacity 0.2s ease;
+        }
+        .button:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 20px rgba(12, 12, 79, 0.2);
+        }
+        .button:disabled {
+          opacity: 0.7;
+          cursor: default;
+        }
+        .msg {
+          margin-top: 16px;
+          font-size: 14px;
+        }
+        .success {
+          color: #15803d;
+        }
+        .error {
+          color: #b91c1c;
+        }
+      `}</style>
+    </div>
+  );
+}
