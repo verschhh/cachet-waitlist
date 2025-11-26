@@ -48,7 +48,7 @@ export default function HomePage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="input"
+            className="input input-blue-placeholder"
           />
           <button
             type="submit"
@@ -113,9 +113,16 @@ export default function HomePage() {
           font-size: 14px;
           outline: none;
         }
+        .input-blue-placeholder::placeholder {
+          color: #0c0c4f;
+          opacity: 1;
+          text-align: center;
+        }
         .input:focus {
           border-color: #0c0c4f;
           box-shadow: 0 0 0 2px rgba(12, 12, 79, 0.09);
+          color: #0c0c4f;
+          text-align: center; 
         }
         .button {
           padding: 12px 14px;
