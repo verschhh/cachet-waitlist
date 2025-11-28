@@ -10,6 +10,16 @@ export default function HomePage() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
+  // --- mouse-follow gradient state ---
+  const [cursorPos, setCursorPos] = useState({ x: 50, y: 50 }); // % of container
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setCursorPos({ x, y });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
@@ -34,7 +44,18 @@ export default function HomePage() {
   };
 
   return (
-    <div className="page">
+    <div
+      className="page"
+      onMouseMove={handleMouseMove}
+      style={
+        {
+          // CSS custom props for the gradient center
+          "--cursor-x": `${cursorPos.x}%`,
+          "--cursor-y": `${cursorPos.y}%`,
+        } as React.CSSProperties
+      }
+    >
+      {/* gradient lives on .page; card stays on top */}
       <div className="card">
         <h1 className="title">Cachet Waitlist</h1>
         <p className="subtitle">
@@ -80,7 +101,25 @@ export default function HomePage() {
           align-items: center;
           justify-content: center;
           padding: 24px;
+          position: relative;
+          overflow: hidden;
+
+          /* base background + spotlight following cursor */
+          background: radial-gradient(
+              circle at var(--cursor-x, 50%) var(--cursor-y, 50%),
+              rgba(12, 12, 79, 0.5),
+              transparent 60%
+            ),
+            #f7f7f7;
         }
+
+        /* In case user prefers reduced motion, disable the effect */
+        @media (prefers-reduced-motion: reduce) {
+          .page {
+            background: #f7f7f7;
+          }
+        }
+
         .card {
           max-width: 420px;
           width: 100%;
@@ -89,11 +128,13 @@ export default function HomePage() {
           padding: 32px 28px;
           text-align: center;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+          position: relative;
+          z-index: 1; /* sits above the gradient */
         }
         .title {
           font-size: 28px;
           font-weight: 800;
-          color: #0c0c4f; /* close to your logo color */
+          color: #0c0c4f;
           margin-bottom: 8px;
         }
         .subtitle {
@@ -122,7 +163,7 @@ export default function HomePage() {
           border-color: #0c0c4f;
           box-shadow: 0 0 0 2px rgba(12, 12, 79, 0.09);
           color: #0c0c4f;
-          text-align: center; 
+          text-align: center;
         }
         .button {
           padding: 12px 14px;
